@@ -1,6 +1,6 @@
 // src/App.js
 import React, { useState, useEffect, useCallback } from 'react';
-import { Heart, Image, BookOpen, User, Calendar, Scale, ChevronDown, ChevronUp, FileText, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Heart, Image, BookOpen, User, Calendar, Scale, ChevronDown, FileText, Menu, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const MemorialWebsite = () => {
   const [activeSection, setActiveSection] = useState('home');
@@ -9,9 +9,9 @@ const MemorialWebsite = () => {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedMemorialCategory, setSelectedMemorialCategory] = useState(null);
   const [selectedEventId, setSelectedEventId] = useState(null);
-  const [expandedTestimonial, setExpandedTestimonial] = useState(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [showHeader, setShowHeader] = useState(false);
+  const [showCopyright, setShowCopyright] = useState(false);
 
   // Modal — index tabanlı navigasyon
   const [currentImageList, setCurrentImageList] = useState([]);
@@ -140,6 +140,10 @@ const MemorialWebsite = () => {
         news: 'Basından Haberler',
         anisina: 'Anısına',
       },
+      home: {
+        tagline: 'Mimar · Akademisyen · Araştırmacı',
+        scroll: 'Aşağı kaydır',
+      },
       gallery: {
         title: 'Hatıralar',
         childhood: 'Çocukluk',
@@ -179,6 +183,10 @@ const MemorialWebsite = () => {
         gallery: 'Memories',
         news: 'Press News',
         anisina: 'In Her Memory',
+      },
+      home: {
+        tagline: 'Architect · Academic · Researcher',
+        scroll: 'Scroll down',
       },
       gallery: {
         title: 'Memories',
@@ -263,6 +271,7 @@ const MemorialWebsite = () => {
     },
     awards: {
       coverImage: './ataturk-award.jpg',
+      coverPosition: 'center 24%',
       images: [
         { src: './elemantary-award.jpg' }, { src: './gencmimar-award.jpg' },
         { src: './kocSchool-award.jpg' }, { src: './music-award.jpg' },
@@ -282,6 +291,7 @@ const MemorialWebsite = () => {
     },
     publications: {
       coverImage: './yayinlar-cover.jpg',
+      coverTint: true,
       images: [],
       pdf: './The-Aesthetics-of-Machine-Vision.pdf',
       pdfStartPage: 13,
@@ -387,22 +397,19 @@ const MemorialWebsite = () => {
 
   useEffect(() => {
     const si = setInterval(() => setCurrentSlide(p => (p + 1) % slideImages.length), 5000);
-    const ht = setTimeout(() => setShowHeader(true), 1500);
+    const ht = setTimeout(() => setShowHeader(true), 300);
     return () => { clearInterval(si); clearTimeout(ht); };
   }, [slideImages.length]);
 
-  const truncateText = (text, maxLength = 200) => {
-    if (!text || text.length <= maxLength) return text;
-    const t = text.substring(0, maxLength);
-    const i = t.lastIndexOf(' ');
-    return (i > maxLength * 0.8 ? t.substring(0, i) : t) + '...';
-  };
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [activeSection]);
 
   const NavItem = ({ section, label }) => (
     <button onClick={() => setActiveSection(section)}
-      className={`px-2 py-3 sm:px-4 sm:py-4 text-xs sm:text-base font-semibold transition-all duration-300 whitespace-nowrap ${activeSection === section ? 'bg-slate-600 text-white' : 'bg-white text-gray-700 hover:bg-slate-100'
-        }`}>
+      className={`relative px-3 py-2 text-[15px] font-medium transition-colors whitespace-nowrap ${activeSection === section ? 'text-slate-900' : 'text-slate-500 hover:text-slate-900'}`}>
       {label}
+      <span className={`absolute left-3 right-3 -bottom-0.5 h-0.5 rounded-full bg-sky-600 transition-transform duration-300 origin-left ${activeSection === section ? 'scale-x-100' : 'scale-x-0'}`} />
     </button>
   );
 
@@ -423,52 +430,43 @@ const MemorialWebsite = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-200 via-blue-100 to-cyan-100 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-sky-100/80 via-slate-50 to-slate-50 flex flex-col text-slate-700">
 
       {/* HEADER */}
-      <header className={`bg-gradient-to-r from-slate-700 via-slate-600 to-slate-700 shadow-lg transition-all duration-1000 ${showHeader ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}>
-        <nav className="max-w-7xl mx-auto relative">
-          <div className="hidden md:block">
-            <div className="absolute right-4 top-1/2 -translate-y-1/2 z-10">
-              <button onClick={() => setLanguage(language === 'tr' ? 'en' : 'tr')}
-                className="bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-lg font-semibold transition-all text-sm">
-                {language === 'tr' ? '🇬🇧 EN' : '🇹🇷 TR'}
-              </button>
-            </div>
-            <div className="flex justify-center items-center divide-x divide-white/20 pr-32">
+      <header className={`bg-white/90 backdrop-blur-md border-b border-slate-200/70 transition-all duration-700 ${showHeader ? 'translate-y-0 opacity-100' : '-translate-y-full opacity-0'}`}>
+        <nav className="max-w-7xl mx-auto px-4 md:px-8">
+          <div className="flex items-center justify-between h-16 md:h-20 gap-4">
+            <button onClick={() => { setActiveSection('home'); setMobileMenuOpen(false); }}
+              className="font-display text-2xl md:text-3xl font-semibold text-slate-800 tracking-wide whitespace-nowrap">
+              Gökçe Önal
+            </button>
+            <div className="hidden lg:flex items-center gap-1">
               {navItems.map(({ section, label }) => <NavItem key={section} section={section} label={label} />)}
             </div>
-          </div>
-          <div className="md:hidden">
-            <div className="flex items-center justify-between px-4 py-3">
-              <h1 className="text-white font-bold text-lg">Gökçe Önal</h1>
-              <div className="flex items-center gap-2">
-                <button onClick={() => setLanguage(language === 'tr' ? 'en' : 'tr')}
-                  className="bg-white/20 hover:bg-white/30 text-white px-2 py-1 rounded text-sm">
-                  {language === 'tr' ? 'EN' : 'TR'}
-                </button>
-                <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="text-white p-2">
-                  {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                </button>
-              </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setLanguage(language === 'tr' ? 'en' : 'tr')}
+                className="text-sm font-medium text-slate-600 hover:text-slate-900 ring-1 ring-slate-300 hover:ring-slate-500 rounded-full px-3 py-1.5 transition-all">
+                {language === 'tr' ? 'EN' : 'TR'}
+              </button>
+              <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="lg:hidden text-slate-700 p-2" aria-label="Menu">
+                {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
             </div>
-            {mobileMenuOpen && (
-              <>
-                <div className="fixed inset-0 bg-black/50 z-40" onClick={() => setMobileMenuOpen(false)} />
-                <div className="absolute top-full left-0 w-full bg-slate-700 shadow-lg z-50">
-                  <div className="flex flex-col">
-                    {navItems.map(({ section, label }) => (
-                      <button key={section} onClick={() => { setActiveSection(section); setMobileMenuOpen(false); }}
-                        className={`px-4 py-3 text-left font-semibold border-b border-slate-600 ${activeSection === section ? 'bg-slate-600 text-white' : 'text-white hover:bg-slate-600'}`}>
-                        {label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </>
-            )}
           </div>
         </nav>
+        {mobileMenuOpen && (
+          <>
+            <div className="lg:hidden absolute left-0 right-0 top-full h-screen bg-slate-900/30" onClick={() => setMobileMenuOpen(false)} />
+            <div className="lg:hidden absolute left-0 right-0 top-full bg-white border-b border-slate-200 shadow-lg z-50">
+              {navItems.map(({ section, label }) => (
+                <button key={section} onClick={() => { setActiveSection(section); setMobileMenuOpen(false); }}
+                  className={`block w-full text-left px-6 py-4 border-b border-slate-100 font-medium transition-colors ${activeSection === section ? 'text-slate-900 bg-sky-50' : 'text-slate-600 hover:bg-slate-50'}`}>
+                  {label}
+                </button>
+              ))}
+            </div>
+          </>
+        )}
       </header>
 
       <main className="flex-1">
@@ -476,21 +474,27 @@ const MemorialWebsite = () => {
         {/* HOME */}
         {activeSection === 'home' && (
           <div className="animate-fadeIn">
-            <div className="min-h-screen flex items-center justify-center py-8 px-4">
+            <div className="min-h-[85vh] flex items-center justify-center py-16 px-4">
               <div className="text-center">
-                <div className="w-64 h-64 rounded-full overflow-hidden border-8 border-white shadow-2xl mx-auto mb-8">
+                <div className="w-56 h-56 md:w-72 md:h-72 rounded-full overflow-hidden border-[6px] border-white ring-1 ring-slate-200 shadow-[0_25px_60px_-20px_rgba(15,23,42,0.45)] mx-auto mb-10">
                   <img src={profileImage} alt="Gökçe Önal" className="w-full h-full object-cover" onError={imgFallback} />
                   <div className="w-full h-full bg-gradient-to-br from-sky-200 to-slate-200 items-center justify-center" style={{ display: 'none' }}>
                     <User size={100} className="text-slate-400" />
                   </div>
                 </div>
-                <h1 className="text-4xl md:text-5xl font-bold text-slate-800 mb-4">Gökçe Önal</h1>
-                <p className="text-2xl md:text-3xl text-slate-600">(1988 - ∞)</p>
+                <h1 className="font-display text-5xl md:text-7xl font-semibold text-slate-800 mb-4 tracking-wide">Gökçe Önal</h1>
+                <p className="text-base md:text-lg tracking-[0.35em] text-slate-500 mb-6">1988 — ∞</p>
+                <div className="w-16 h-px bg-slate-300 mx-auto mb-6" />
+                <p className="font-display italic text-xl md:text-2xl text-slate-600">{t.home.tagline}</p>
+                <button onClick={() => window.scrollTo({ top: window.innerHeight * 0.8, behavior: 'smooth' })}
+                  className="mt-12 text-slate-400 hover:text-slate-600 transition-colors animate-bounce" aria-label={t.home.scroll}>
+                  <ChevronDown size={28} />
+                </button>
               </div>
             </div>
-            <div className="py-16 px-8">
+            <div className="pb-24 px-5 md:px-8">
               <div className="max-w-5xl mx-auto">
-                <div className="relative h-[450px] rounded-2xl overflow-hidden shadow-2xl">
+                <div className="relative h-[260px] sm:h-[400px] md:h-[520px] rounded-3xl overflow-hidden ring-1 ring-black/5 shadow-[0_30px_80px_-30px_rgba(15,23,42,0.5)]">
                   {slideImages.map((img, i) => (
                     <div key={i} className={`absolute inset-0 transition-opacity duration-1000 ${i === currentSlide ? 'opacity-100' : 'opacity-0'}`}>
                       <img src={img} alt={`Slayt ${i + 1}`} className="w-full h-full object-cover" onError={imgFallback} />
@@ -511,14 +515,14 @@ const MemorialWebsite = () => {
 
         {/* ABOUT */}
         {activeSection === 'about' && (
-          <div className="animate-fadeIn py-20 px-8">
+          <div className="animate-fadeIn py-16 md:py-24 px-5 md:px-8">
             <div className="max-w-5xl mx-auto">
-              <h2 className="text-5xl font-bold text-slate-800 text-center mb-16">{language === 'tr' ? 'Hakkında' : 'About'}</h2>
-              <div className="bg-white border-2 border-slate-200 rounded-lg p-10 shadow-xl mb-8">
-                <h3 className="text-3xl font-bold text-gray-800 mb-8">{language === 'tr' ? 'Gökçe Önal Kimdir?' : 'Who is Gökçe Önal?'}</h3>
+              <h2 className="section-title">{language === 'tr' ? 'Hakkında' : 'About'}</h2>
+              <div className="bg-white rounded-3xl ring-1 ring-slate-200/80 shadow-sm p-6 sm:p-10 md:p-12 mb-8">
+                <h3 className="font-display text-3xl md:text-4xl font-semibold text-slate-800 mb-8">{language === 'tr' ? 'Gökçe Önal Kimdir?' : 'Who is Gökçe Önal?'}</h3>
                 <div className="flex flex-col md:flex-row gap-8 mb-8">
                   <div className="md:w-1/3">
-                    <div className="w-full aspect-[3/4] rounded-lg overflow-hidden border-4 border-slate-200 shadow-lg">
+                    <div className="w-full aspect-[3/4] rounded-2xl overflow-hidden ring-1 ring-slate-200 shadow-md">
                       <img src="./hakkinda.jpg" alt="Gökçe Önal" className="w-full h-full object-cover" onError={imgFallback} />
                       <div className="w-full h-full bg-gradient-to-br from-sky-200 to-slate-200 flex items-center justify-center" style={{ display: 'none' }}>
                         <User size={80} className="text-slate-400" />
@@ -537,7 +541,7 @@ const MemorialWebsite = () => {
                 </div>
                 <div className="space-y-6">
                   <div>
-                    <h4 className="text-2xl font-bold text-gray-800 mb-4">{language === 'tr' ? 'Akademik Kariyer' : 'Academic Career'}</h4>
+                    <h4 className="font-display text-2xl md:text-[1.75rem] font-semibold text-slate-800 mb-4">{language === 'tr' ? 'Akademik Kariyer' : 'Academic Career'}</h4>
                     <p className="text-gray-700 leading-relaxed mb-4">
                       {language === 'tr'
                         ? "Kariyerinin erken dönemlerinde kısa bir süre Ofis 16 Mimarlık çatısı altında mimari pratik deneyimi de yaşayan Gökçe, 2013 yılından sonra tamamen akademik çalışmalara yöneldi. 2016 yılından itibaren Hollanda'nın prestijli üniversitelerinden biri olan TU Delft Mimarlık ve Yapılı Çevre Fakültesi'nde çeşitli dönemlerde yarı zamanlı eğitmen olarak çalıştı."
@@ -550,7 +554,7 @@ const MemorialWebsite = () => {
                     </ul>
                   </div>
                   <div>
-                    <h4 className="text-2xl font-bold text-gray-800 mb-4">{language === 'tr' ? 'Editörlük' : 'Editorial Activities'}</h4>
+                    <h4 className="font-display text-2xl md:text-[1.75rem] font-semibold text-slate-800 mb-4">{language === 'tr' ? 'Editörlük' : 'Editorial Activities'}</h4>
                     <p className="text-gray-700 leading-relaxed">
                       {language === 'tr'
                         ? "2021 yılından itibaren Backchannels 4S Blog'da yardımcı editör olarak görev aldı. Sosyal bilimler ve STS (Science, Technology and Society) içerik hazırlayan bu platformda disiplinler arası bakış açısını yaygınlaştırmayı hedefledi."
@@ -558,7 +562,7 @@ const MemorialWebsite = () => {
                     </p>
                   </div>
                   <div>
-                    <h4 className="text-2xl font-bold text-gray-800 mb-4">{language === 'tr' ? 'Kısa Bilgiler' : 'Quick Info'}</h4>
+                    <h4 className="font-display text-2xl md:text-[1.75rem] font-semibold text-slate-800 mb-4">{language === 'tr' ? 'Kısa Bilgiler' : 'Quick Info'}</h4>
                     <div className="space-y-2 text-gray-700">
                       <p><strong>{language === 'tr' ? 'Mezuniyet:' : 'Graduation:'}</strong> {language === 'tr' ? 'İTÜ Mimarlık Fakültesi (2011)' : 'ITU Faculty of Architecture (2011)'}</p>
                       <p><strong>{language === 'tr' ? 'Yüksek Lisans & Görev:' : 'Master & Position:'}</strong> {language === 'tr' ? 'ODTÜ Mimarlık Fakültesi, araştırma görevlisi' : 'METU Faculty of Architecture, research assistant'}</p>
@@ -567,9 +571,9 @@ const MemorialWebsite = () => {
                     </div>
                   </div>
                   <div className="mt-8 pt-6 border-t-2 border-gray-200 flex items-center justify-between">
-                    <h4 className="text-2xl font-bold text-gray-800">{language === 'tr' ? 'Özgeçmiş' : 'Curriculum Vitae'}</h4>
+                    <h4 className="font-display text-2xl md:text-[1.75rem] font-semibold text-slate-800">{language === 'tr' ? 'Özgeçmiş' : 'Curriculum Vitae'}</h4>
                     <a href="./gokce-onal-cv.pdf" download="Gokce-Onal-CV.pdf"
-                      className="inline-flex items-center gap-2 bg-slate-600 hover:bg-slate-700 text-white px-4 py-2 rounded-lg font-semibold transition-all shadow-md">
+                      className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-900 text-white px-5 py-2.5 rounded-full font-medium transition-all shadow-sm">
                       <FileText size={16} />
                       {language === 'tr' ? 'CV İndir' : 'Download CV'}
                     </a>
@@ -582,47 +586,49 @@ const MemorialWebsite = () => {
 
         {/* MEMORIALS */}
         {activeSection === 'memorials' && (
-          <div className="animate-fadeIn py-20 px-8">
+          <div className="animate-fadeIn py-16 md:py-24 px-5 md:px-8">
             <div className="max-w-7xl mx-auto">
-              <h2 className="text-5xl font-bold text-slate-800 text-center mb-16">{t.memorials.title}</h2>
+              <h2 className="section-title">{t.memorials.title}</h2>
               {!selectedMemorialCategory ? (
                 <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
                   {['projects', 'awards', 'drawings', 'publications'].map((cat) => (
                     <div key={cat} onClick={() => { setSelectedMemorialCategory(cat); window.history.pushState({ type: 'memorial' }, ''); }}
-                      className="bg-white border-2 border-slate-200 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 cursor-pointer">
-                      <div className="aspect-video overflow-hidden">
-                        <img src={memorialCategories[cat].coverImage} alt={t.memorials[cat]} className="w-full h-full object-cover" onError={imgFallback} />
+                      className="tile bg-white rounded-2xl overflow-hidden ring-1 ring-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 cursor-pointer">
+                      <div className={`aspect-video overflow-hidden ${memorialCategories[cat].coverTint ? 'bg-sky-50 border-b border-slate-200/80' : ''}`}>
+                        <img src={memorialCategories[cat].coverImage} alt={t.memorials[cat]}
+                          className={`w-full h-full object-cover ${memorialCategories[cat].coverTint ? 'mix-blend-multiply' : ''}`}
+                          style={{ objectPosition: memorialCategories[cat].coverPosition || 'center' }} onError={imgFallback} />
                         <Placeholder size={100} />
                       </div>
-                      <div className="p-6 text-center"><h3 className="text-2xl font-bold text-gray-800">{t.memorials[cat]}</h3></div>
+                      <div className="px-6 py-5 text-center"><h3 className="font-display text-2xl md:text-[1.7rem] font-semibold text-slate-800">{t.memorials[cat]}</h3></div>
                     </div>
                   ))}
                 </div>
               ) : (
                 <div>
-                  <button onClick={() => setSelectedMemorialCategory(null)} className="mb-8 px-6 py-3 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all shadow-lg">
+                  <button onClick={() => setSelectedMemorialCategory(null)} className="mb-10 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white ring-1 ring-slate-200 text-slate-600 hover:text-slate-900 hover:ring-slate-400 font-medium shadow-sm transition-all">
                     ← {t.memorials.backToCategories}
                   </button>
-                  <h3 className="text-3xl font-bold text-slate-800 text-center mb-12">{t.memorials[selectedMemorialCategory]}</h3>
+                  <h3 className="font-display text-3xl md:text-4xl font-semibold text-slate-800 text-center mb-12">{t.memorials[selectedMemorialCategory]}</h3>
                   {selectedMemorialCategory === 'publications' ? (() => {
                     const pub = memorialCategories.publications;
                     const pdfUrl = `${pub.pdf}#page=${pub.pdfStartPage}`;
                     return (
                       <div className="max-w-4xl mx-auto">
-                        <div className="bg-white border-2 border-slate-200 rounded-xl shadow-xl p-8 md:p-10">
-                          <p className="text-sm text-slate-500 mb-2">{pub[`citation_${language}`]}</p>
-                          <h4 className="text-3xl font-bold text-gray-800 mb-6">{pub.chapterTitle}</h4>
+                        <div className="bg-white rounded-3xl ring-1 ring-slate-200/80 shadow-sm p-6 sm:p-10">
+                          <p className="text-xs uppercase tracking-[0.15em] text-sky-700 mb-3">{pub[`citation_${language}`]}</p>
+                          <h4 className="font-display text-3xl md:text-4xl font-semibold text-slate-800 mb-6">{pub.chapterTitle}</h4>
                           <div className="space-y-4 text-gray-700 leading-relaxed text-lg">
                             {pub[`text_${language}`].map((para, idx) => <p key={idx}>{para}</p>)}
                           </div>
                           <div className="flex flex-wrap gap-4 mt-8">
                             <a href={pdfUrl} target="_blank" rel="noopener noreferrer"
-                              className="inline-flex items-center gap-2 bg-slate-600 hover:bg-slate-700 text-white px-6 py-3 rounded-lg font-semibold transition-all shadow-md">
+                              className="inline-flex items-center gap-2 bg-slate-800 hover:bg-slate-900 text-white px-6 py-3 rounded-full font-medium transition-all shadow-sm">
                               <BookOpen size={18} />
                               {t.memorials.readPdf}
                             </a>
                             <a href={pub.pdf} download="The-Aesthetics-of-Machine-Vision.pdf"
-                              className="inline-flex items-center gap-2 bg-white hover:bg-slate-100 text-slate-700 border-2 border-slate-300 px-6 py-3 rounded-lg font-semibold transition-all shadow-md">
+                              className="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 ring-1 ring-slate-300 hover:ring-slate-400 px-6 py-3 rounded-full font-medium transition-all">
                               <FileText size={18} />
                               {t.memorials.downloadPdf}
                             </a>
@@ -631,7 +637,7 @@ const MemorialWebsite = () => {
                         <iframe
                           title={pub.chapterTitle}
                           src={pdfUrl}
-                          className="hidden md:block w-full h-[85vh] mt-8 rounded-xl border-2 border-slate-200 bg-white shadow-lg"
+                          className="hidden md:block w-full h-[85vh] mt-8 rounded-2xl ring-1 ring-slate-200 bg-white shadow-sm"
                         />
                       </div>
                     );
@@ -641,7 +647,7 @@ const MemorialWebsite = () => {
                       const list = memorialCategories[selectedMemorialCategory].images.map(x => x.src);
                       return (
                         <div key={i} onClick={() => openImage(list, i)}
-                          className="aspect-square rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 cursor-pointer">
+                          className="tile aspect-square rounded-xl overflow-hidden bg-white ring-1 ring-slate-200/80 shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer">
                           <img src={item.src} alt={`${t.memorials[selectedMemorialCategory]} ${i + 1}`} className="w-full h-full object-cover" onError={imgFallback} />
                           <Placeholder />
                         </div>
@@ -657,35 +663,35 @@ const MemorialWebsite = () => {
 
         {/* GALLERY */}
         {activeSection === 'gallery' && (
-          <div className="animate-fadeIn py-20 px-8">
+          <div className="animate-fadeIn py-16 md:py-24 px-5 md:px-8">
             <div className="max-w-7xl mx-auto">
-              <h2 className="text-5xl font-bold text-slate-800 text-center mb-16">{t.gallery.title}</h2>
+              <h2 className="section-title">{t.gallery.title}</h2>
               {!selectedCategory ? (
                 <div className="grid md:grid-cols-3 gap-8">
                   {['childhood', 'youth', 'adulthood'].map((cat) => (
                     <div key={cat} onClick={() => { setSelectedCategory(cat); window.history.pushState({ type: 'gallery' }, ''); }}
-                      className="bg-white border-2 border-slate-200 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 cursor-pointer">
+                      className="tile bg-white rounded-2xl overflow-hidden ring-1 ring-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 cursor-pointer">
                       <div className="aspect-square overflow-hidden">
                         <img src={galleryCategories[cat].coverImage} alt={t.gallery[cat]} className="w-full h-full object-cover" onError={imgFallback} />
                         <Placeholder />
                       </div>
-                      <div className="p-6 text-center"><h3 className="text-2xl font-semibold text-gray-800">{t.gallery[cat]}</h3></div>
+                      <div className="px-6 py-5 text-center"><h3 className="font-display text-2xl md:text-[1.7rem] font-semibold text-slate-800">{t.gallery[cat]}</h3></div>
                     </div>
                   ))}
                 </div>
               ) : (
                 <div>
-                  <button onClick={() => setSelectedCategory(null)} className="mb-8 px-6 py-3 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all shadow-lg">
+                  <button onClick={() => setSelectedCategory(null)} className="mb-10 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white ring-1 ring-slate-200 text-slate-600 hover:text-slate-900 hover:ring-slate-400 font-medium shadow-sm transition-all">
                     ← {t.gallery.backToCategories}
                   </button>
-                  <h3 className="text-3xl font-bold text-slate-800 text-center mb-12">{t.gallery[selectedCategory]}</h3>
+                  <h3 className="font-display text-3xl md:text-4xl font-semibold text-slate-800 text-center mb-12">{t.gallery[selectedCategory]}</h3>
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {galleryCategories[selectedCategory].images.map((item, i) => {
                       const list = galleryCategories[selectedCategory].images.map(x => x.src);
                       return (
                         <div key={i}>
                           <div onClick={() => openImage(list, i)}
-                            className="aspect-square rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 cursor-pointer">
+                            className="tile aspect-square rounded-xl overflow-hidden bg-white ring-1 ring-slate-200/80 shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer">
                             <img src={item.src} alt={`${t.gallery[selectedCategory]} ${i + 1}`} className="w-full h-full object-cover" onError={imgFallback} />
                             <Placeholder />
                           </div>
@@ -708,23 +714,23 @@ const MemorialWebsite = () => {
 
         {/* NEWS */}
         {activeSection === 'news' && (
-          <div className="animate-fadeIn py-20 px-8">
+          <div className="animate-fadeIn py-16 md:py-24 px-5 md:px-8">
             <div className="max-w-7xl mx-auto">
-              <h2 className="text-5xl font-bold text-slate-800 text-center mb-16">{language === 'tr' ? 'Basından Haberler' : 'Press News'}</h2>
+              <h2 className="section-title">{language === 'tr' ? 'Basından Haberler' : 'Press News'}</h2>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {newsData.map((item) => (
                   <a key={item.id} href={item.sourceUrl} target="_blank" rel="noopener noreferrer"
-                    className="group bg-white border-2 border-slate-200 rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300">
+                    className="group tile bg-white rounded-2xl overflow-hidden ring-1 ring-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 flex flex-col">
                     <div className="aspect-[4/3] overflow-hidden">
                       <img src={item.imageUrl} alt={language === 'tr' ? item.title_tr : item.title_en}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" onError={imgFallback} />
                       <Placeholder />
                     </div>
-                    <div className="p-8">
-                      <h3 className="text-xl font-bold text-gray-800 group-hover:text-slate-600 transition-colors mb-4">
+                    <div className="p-7 flex flex-col flex-1 justify-between">
+                      <h3 className="font-display text-2xl font-semibold leading-snug text-slate-800 group-hover:text-sky-700 transition-colors mb-4">
                         {language === 'tr' ? item.title_tr : item.title_en}
                       </h3>
-                      <p className="text-slate-600 font-medium">{language === 'tr' ? 'Haberi oku' : 'Read article'} →</p>
+                      <p className="text-sky-700 font-medium text-sm tracking-wide">{language === 'tr' ? 'Haberi oku' : 'Read article'} →</p>
                     </div>
                   </a>
                 ))}
@@ -735,24 +741,24 @@ const MemorialWebsite = () => {
 
         {/* ANISINA */}
         {activeSection === 'anisina' && (
-          <div className="animate-fadeIn py-20 px-8">
+          <div className="animate-fadeIn py-16 md:py-24 px-5 md:px-8">
             <div className="max-w-7xl mx-auto">
-              <h2 className="text-5xl font-bold text-slate-800 text-center mb-3">{t.anisina.title}</h2>
-              <p className="text-center text-slate-500 mb-16 text-lg">{t.anisina.subtitle}</p>
+              <h2 className="section-title tight">{t.anisina.title}</h2>
+              <p className="text-center font-display italic text-slate-500 mb-16 text-xl md:text-2xl">{t.anisina.subtitle}</p>
 
               {!selectedEventId ? (
                 <div className="grid md:grid-cols-3 gap-8">
                   {eventsData.map((event) => (
                     <div key={event.id} onClick={() => { setSelectedEventId(event.id); window.history.pushState({ type: 'event' }, ''); }}
-                      className="bg-white border-2 border-slate-200 rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transform hover:-translate-y-2 transition-all duration-300 cursor-pointer flex flex-col">
+                      className="tile bg-white rounded-2xl overflow-hidden ring-1 ring-slate-200/80 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-500 cursor-pointer flex flex-col">
                       <div className="aspect-video overflow-hidden relative">
                         <img src={event.coverImage} alt={language === 'tr' ? event.title_tr : event.title_en}
                           className={`w-full h-full object-cover ${event.id === 'ani-yazilari' ? 'object-bottom' : ''}`} onError={imgFallback} />
                         <Placeholder />
 
                       </div>
-                      <div className="p-6 flex flex-col items-center text-center flex-1">
-                        <h3 className="text-xl font-bold text-gray-800 mb-1">{language === 'tr' ? event.title_tr : event.title_en}</h3>
+                      <div className="px-6 py-5 flex flex-col items-center justify-center text-center flex-1">
+                        <h3 className="font-display text-2xl font-semibold text-slate-800 leading-snug mb-1">{language === 'tr' ? event.title_tr : event.title_en}</h3>
                         {(language === 'tr' ? event.subtitle_tr : event.subtitle_en) && (
                           <p className="text-slate-500 text-sm mb-2">{language === 'tr' ? event.subtitle_tr : event.subtitle_en}</p>
                         )}
@@ -770,11 +776,11 @@ const MemorialWebsite = () => {
                 if (!event) return null;
                 return (
                   <div>
-                    <button onClick={() => setSelectedEventId(null)} className="mb-8 px-6 py-3 bg-slate-600 hover:bg-slate-700 text-white rounded-lg font-semibold transition-all shadow-lg">
+                    <button onClick={() => setSelectedEventId(null)} className="mb-10 inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-white ring-1 ring-slate-200 text-slate-600 hover:text-slate-900 hover:ring-slate-400 font-medium shadow-sm transition-all">
                       {t.anisina.backToEvents}
                     </button>
                     <div className="text-center mb-12">
-                      <h3 className="text-3xl font-bold text-slate-800 mb-2">{language === 'tr' ? event.title_tr : event.title_en}</h3>
+                      <h3 className="font-display text-3xl md:text-4xl font-semibold text-slate-800 mb-2">{language === 'tr' ? event.title_tr : event.title_en}</h3>
                       {(language === 'tr' ? event.subtitle_tr : event.subtitle_en) && (
                         <p className="text-slate-500 text-lg">{language === 'tr' ? event.subtitle_tr : event.subtitle_en}</p>
                       )}
@@ -787,7 +793,7 @@ const MemorialWebsite = () => {
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                       {event.images.map((src, i) => (
                         <div key={i} onClick={() => openImage(event.images, i)}
-                          className="aspect-square rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transform hover:scale-105 transition-all duration-300 cursor-pointer">
+                          className="tile aspect-square rounded-xl overflow-hidden bg-white ring-1 ring-slate-200/80 shadow-sm hover:shadow-xl transition-all duration-500 cursor-pointer">
                           <img src={src} alt={`${language === 'tr' ? event.title_tr : event.title_en} ${i + 1}`}
                             className="w-full h-full object-cover" onError={imgFallback} />
                           <Placeholder />
@@ -833,15 +839,15 @@ const MemorialWebsite = () => {
       )}
 
       {/* COPYRIGHT MODAL */}
-      {activeSection === 'copyright' && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 animate-fadeIn"
-          onClick={() => setActiveSection('home')}>
-          <div className="bg-white rounded-xl p-10 max-w-2xl w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
+      {showCopyright && (
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fadeIn"
+          onClick={() => setShowCopyright(false)}>
+          <div className="bg-white rounded-3xl p-8 md:p-10 max-w-2xl w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-center mb-6"><Scale size={48} className="text-slate-600" /></div>
-            <h2 className="text-3xl font-bold text-slate-800 text-center mb-6">{t.copyright.title}</h2>
+            <h2 className="font-display text-3xl md:text-4xl font-semibold text-slate-800 text-center mb-6">{t.copyright.title}</h2>
             <p className="text-gray-700 leading-relaxed">{t.copyright.content}</p>
-            <button onClick={() => setActiveSection('home')}
-              className="mt-8 w-full bg-slate-600 hover:bg-slate-700 text-white py-3 rounded-lg font-semibold transition-all">
+            <button onClick={() => setShowCopyright(false)}
+              className="mt-8 w-full bg-slate-800 hover:bg-slate-900 text-white py-3 rounded-full font-medium transition-all">
               {t.copyright.close}
             </button>
           </div>
@@ -849,17 +855,17 @@ const MemorialWebsite = () => {
       )}
 
       {/* FOOTER */}
-      <footer className="bg-gradient-to-r from-slate-700 via-slate-600 to-slate-700 text-white py-8">
-        <div className="max-w-7xl mx-auto px-8">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <p className="text-lg flex items-center gap-2">
-              {t.footer} <Heart size={20} className="fill-white" />
-            </p>
-            <button onClick={() => setActiveSection('copyright')}
-              className="flex items-center gap-2 px-6 py-2 bg-white/10 hover:bg-white/20 rounded-lg font-semibold transition-all border border-white/20">
-              <Scale size={18} /> {t.copyright.button}
-            </button>
-          </div>
+      <footer className="bg-slate-900 text-slate-300">
+        <div className="max-w-7xl mx-auto px-6 md:px-8 py-12 flex flex-col items-center text-center gap-4">
+          <p className="font-display text-3xl text-white tracking-wide">Gökçe Önal</p>
+          <p className="text-sm tracking-[0.35em] text-slate-400">1988 — ∞</p>
+          <p className="flex items-center gap-2 text-slate-300 mt-2">
+            {t.footer} <Heart size={16} className="fill-rose-400 text-rose-400" />
+          </p>
+          <button onClick={() => setShowCopyright(true)}
+            className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
+            <Scale size={15} /> {t.copyright.button}
+          </button>
         </div>
       </footer>
 
@@ -867,6 +873,13 @@ const MemorialWebsite = () => {
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .animate-fadeIn { animation: fadeIn 0.5s ease-out; }
         header { position: sticky; top: 0; z-index: 40; }
+        .font-display { font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif; }
+        .section-title { font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 600; font-size: 2.5rem; line-height: 1.1; color: #1e293b; text-align: center; margin-bottom: 4rem; letter-spacing: 0.01em; }
+        .section-title.tight { margin-bottom: 1rem; }
+        .section-title::after { content: ''; display: block; width: 56px; height: 2px; border-radius: 2px; background: #0284c7; opacity: 0.55; margin: 1.25rem auto 0; }
+        @media (min-width: 768px) { .section-title { font-size: 3.5rem; } }
+        .tile img { transition: transform 0.7s ease; }
+        .tile:hover img { transform: scale(1.05); }
         .memory-text { word-wrap: break-word; word-break: break-word; overflow-wrap: break-word; hyphens: auto; max-width: 100%; }
       `}</style>
     </div>
